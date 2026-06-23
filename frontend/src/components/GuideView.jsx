@@ -67,13 +67,17 @@ export default function GuideView({ topic, onBack, onChat }) {
 
           <div className="escalation-card">
             <div className="escalation-title">Still stuck?</div>
-            <div className="escalation-body">Start a live session with a Soraso support agent.</div>
-            <button className="contact-btn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                <path d="M4 13a8 8 0 0 1 16 0M4 13v3a2 2 0 0 0 2 2h1v-5H6a2 2 0 0 0-2 0zM20 13v3a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 0z"/>
-              </svg>
-              Contact support
-            </button>
+            <div className="escalation-body">ติดต่อทีม Soraso AI Specialist ได้เลยครับ</div>
+            <div className="escalation-contacts">
+              <a className="contact-link" href="https://line.me/R/ti/p/@soraso" target="_blank" rel="noreferrer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12 2C6.48 2 2 5.92 2 10.72c0 3.25 2.08 6.1 5.22 7.72-.2.76-.74 2.76-.85 3.19-.14.54.2.54.42.39.17-.11 2.72-1.84 3.83-2.6.44.06.89.1 1.38.1 5.52 0 10-3.92 10-8.72S17.52 2 12 2z"/></svg>
+                Line OA: @soraso
+              </a>
+              <a className="contact-link" href="mailto:support@soraso.tech">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M4 4h16v16H4z"/><path d="m4 4 8 9 8-9"/></svg>
+                support@soraso.tech
+              </a>
+            </div>
           </div>
         </div>
       </div>

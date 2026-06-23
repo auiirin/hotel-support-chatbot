@@ -26,7 +26,7 @@ export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onF
         </button>
         <span className="context-pill">
           <span className="context-dot" />
-          Hotel Support
+          Soraso AI Specialist
         </span>
       </div>
 

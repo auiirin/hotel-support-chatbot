@@ -907,6 +907,27 @@ body {
 }
 .contact-btn:hover { opacity: 0.88; }
 
+.escalation-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--red);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.contact-link:hover { opacity: 0.88; }
+
 /* ── Error banner ── */
 .error-banner {
   margin: 0 16px 8px;
