@@ -53,8 +53,13 @@ export default function ChatPage() {
         imageToSend,
       );
     } catch {
-      setError('เกิดข้อผิดพลาด ไม่สามารถเชื่อมต่อกับ server ได้');
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        // If AI already replied with content, don't remove the message or show error
+        if (last?.role === 'assistant' && last?.content) return prev;
+        setError('เกิดข้อผิดพลาด ไม่สามารถเชื่อมต่อกับ server ได้');
+        return prev.slice(0, -1);
+      });
       setIsStreaming(false);
     }
   }
