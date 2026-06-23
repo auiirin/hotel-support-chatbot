@@ -17,6 +17,7 @@ export default function ChatPage() {
   const [showEscForm, setShowEscForm] = useState(false);
   const [escLoading, setEscLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const receivedContentRef = useRef(false);
 
   function handleImageChange(e) {
     const file = e.target.files[0];
@@ -49,12 +50,14 @@ export default function ChatPage() {
     setIsStreaming(true);
     setError(null);
     setImage(null);
+    receivedContentRef.current = false;
 
     try {
       await sendMessageStream(
         text,
         history,
         (chunk) => {
+          receivedContentRef.current = true;
           setMessages((prev) => {
             const next = [...prev];
             next[next.length - 1] = { role: 'assistant', content: next[next.length - 1].content + chunk };
@@ -65,13 +68,10 @@ export default function ChatPage() {
         imageToSend,
       );
     } catch {
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        // If AI already replied with content, don't remove the message or show error
-        if (last?.role === 'assistant' && last?.content) return prev;
+      if (!receivedContentRef.current) {
         setError('เกิดข้อผิดพลาด ไม่สามารถเชื่อมต่อกับ server ได้');
-        return prev.slice(0, -1);
-      });
+        setMessages((prev) => prev.slice(0, -1));
+      }
       setIsStreaming(false);
     }
   }
