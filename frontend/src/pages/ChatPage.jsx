@@ -191,7 +191,9 @@ export default function ChatPage() {
                     onResolved={handleResolved}
                     onEscalate={handleEscalate}
                   />
-                  {error && <div className="error-banner">{error}</div>}
+                  {error && !messages.some((m) => m.role === 'assistant' && m.content) && (
+                    <div className="error-banner">{error}</div>
+                  )}
                   <InputBar onSend={handleSend} disabled={isStreaming} />
                 </>
               )}
