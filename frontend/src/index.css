@@ -312,12 +312,19 @@ body {
 }
 .input-container:focus-within { border-color: var(--purple); }
 
-.input-placeholder {
-  color: var(--text-placeholder);
-  font-size: 14px;
-  margin-bottom: 14px;
+.launch-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
   font-family: inherit;
+  font-size: 14px;
+  color: var(--text-body);
+  background: transparent;
+  margin-bottom: 10px;
+  line-height: 1.5;
 }
+.launch-textarea::placeholder { color: var(--text-placeholder); }
 
 .input-row {
   display: flex;

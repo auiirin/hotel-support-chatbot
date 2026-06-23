@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 export default function LaunchView({ onSend, onSendImage, disabled, image, onAttach, onRemoveImage, fileInputRef }) {
   const suggestions = [
     'How do I fix a Gen Key Card error?',
@@ -74,7 +76,20 @@ export default function LaunchView({ onSend, onSendImage, disabled, image, onAtt
   );
 }
 
-function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveImage, fileInputRef, compact }) {
+function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveImage, fileInputRef }) {
+  const [text, setText] = useState('');
+
+  function handleSubmit() {
+    if (!text.trim() && !image) return;
+    if (image) onSendImage(text.trim(), image);
+    else onSend(text.trim());
+    setText('');
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
+  }
+
   return (
     <div className="input-bar-wrap">
       {image && (
@@ -83,10 +98,16 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
           <button type="button" className="image-remove-btn" onClick={onRemoveImage}>✕</button>
         </div>
       )}
-      <div className={compact ? 'input-container-compact' : 'input-container'}>
-        {!compact && (
-          <div className="input-placeholder">Ask something…</div>
-        )}
+      <div className="input-container">
+        <textarea
+          className="launch-textarea"
+          placeholder="Ask something…"
+          rows={1}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+        />
         <div className="input-row">
           <button className="attach-btn" type="button" onClick={() => fileInputRef.current?.click()} disabled={disabled}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -102,18 +123,7 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
                 <path d="m6 9 6 6 6-6"/>
               </svg>
             </button>
-            <span className="mic-icon">
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2">
-                <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-                <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
-              </svg>
-            </span>
-            <button
-              className="send-btn"
-              type="button"
-              disabled={disabled}
-              onClick={() => onSendImage && image ? onSendImage('', image) : onSend && onSend('')}
-            >
+            <button className="send-btn" type="button" disabled={disabled || (!text.trim() && !image)} onClick={handleSubmit}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4">
                 <path d="M12 19V5M5 12l7-7 7 7"/>
               </svg>
@@ -121,9 +131,7 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
           </div>
         </div>
       </div>
-      {!compact && (
-        <div className="input-disclaimer">AI can make mistakes. Verify important actions before applying.</div>
-      )}
+      <div className="input-disclaimer">AI can make mistakes. Verify important actions before applying.</div>
     </div>
   );
 }
