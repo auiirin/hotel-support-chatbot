@@ -53,8 +53,8 @@ export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onF
             </div>
           </div>
         )}
-        {/* Resolve / Escalate actions after last AI message */}
-        {!isStreaming && messages.length > 1 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.content && (
+        {/* Resolve / Escalate actions — only when AI gave step-by-step solution */}
+        {!isStreaming && messages.length > 1 && messages[messages.length - 1]?.role === 'assistant' && /(\d+\.|ขั้นตอน|step\s*\d|กรุณา.+แล้ว|ลอง.+อีกครั้ง)/i.test(messages[messages.length - 1]?.content || '') && (
           <div className="resolve-actions">
             <button className="resolve-btn" onClick={onResolved}>
               ✅ แก้ไขเรียบร้อย
