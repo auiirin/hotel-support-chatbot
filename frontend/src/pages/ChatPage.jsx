@@ -5,6 +5,7 @@ import InputBar from '../components/InputBar.jsx';
 import LaunchView from '../components/LaunchView.jsx';
 import GuideView from '../components/GuideView.jsx';
 import { sendMessageStream, resolveCase } from '../api/chat.js';
+import EscalationForm from '../components/EscalationForm.jsx';
 
 export default function ChatPage() {
   const [panelOpen, setPanelOpen] = useState(false);
@@ -13,6 +14,8 @@ export default function ChatPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
   const [image, setImage] = useState(null);
+  const [showEscForm, setShowEscForm] = useState(false);
+  const [escLoading, setEscLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   function handleImageChange(e) {
@@ -80,8 +83,34 @@ export default function ChatPage() {
     await handleSend('__resolved__');
   }
 
-  async function handleEscalate() {
-    await handleSend('__escalate__');
+  function handleEscalate() {
+    setShowEscForm(true);
+  }
+
+  async function handleEscalateSubmit(formData) {
+    setEscLoading(true);
+    try {
+      const problem = messages.find((m) => m.role === 'user')?.content || '';
+      const errorDetail = messages.filter((m) => m.role === 'user').map((m) => m.content).join(' | ');
+      const stepsTried = messages.filter((m) => m.role === 'assistant').map((m) => m.content).join('\n---\n');
+
+      await fetch('/api/chat/escalate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, problem, errorDetail, stepsTried }),
+      });
+
+      setShowEscForm(false);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', content: `❌ ยังแก้ไม่ได้ครับ (${formData.hotelName} — ${formData.reporterName})` },
+        { role: 'assistant', content: `ส่งเรื่องให้ทีม Support เรียบร้อยแล้วครับ 📧\n\nทีมจะติดต่อกลับที่ **${formData.contact}** โดยเร็วที่สุดนะครับ ขอโทษที่ทำให้ไม่สะดวกครับ` },
+      ]);
+    } catch {
+      alert('ส่ง Email ไม่สำเร็จ กรุณาลองใหม่อีกครั้งครับ');
+    } finally {
+      setEscLoading(false);
+    }
   }
 
   function handleClear() {
@@ -132,7 +161,14 @@ export default function ChatPage() {
               </div>
             </header>
 
-            <main className="app-main">
+            <main className="app-main" style={{ position: 'relative' }}>
+              {showEscForm && (
+                <EscalationForm
+                  onSubmit={handleEscalateSubmit}
+                  onCancel={() => setShowEscForm(false)}
+                  isLoading={escLoading}
+                />
+              )}
               {view === 'launch' && (
                 <LaunchView
                   onSend={(text) => handleSend(text)}

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { searchRelevantChunks } from '../services/search.js';
 import { getChatResponse, streamChatResponse } from '../services/claude.js';
 import { logConversation } from '../services/conversationLogger.js';
+import { sendEscalationEmail } from '../services/mailer.js';
 
 const router = Router();
 
@@ -52,6 +53,21 @@ router.post('/stream', async (req, res) => {
     res.write(`data: ${JSON.stringify({ error: 'Internal server error' })}\n\n`);
   } finally {
     res.end();
+  }
+});
+
+router.post('/escalate', async (req, res) => {
+  try {
+    const { hotelName, reporterName, contact, problem, errorDetail, stepsTried } = req.body;
+    if (!hotelName || !reporterName || !contact) {
+      return res.status(400).json({ error: 'hotelName, reporterName, contact are required' });
+    }
+    await sendEscalationEmail({ hotelName, reporterName, contact, problem, errorDetail, stepsTried });
+    logConversation({ type: 'escalated', hotelName, reporterName, contact, problem });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Escalate error:', err);
+    res.status(500).json({ error: 'Failed to send escalation email' });
   }
 });
 
