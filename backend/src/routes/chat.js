@@ -62,11 +62,15 @@ router.post('/escalate', async (req, res) => {
     if (!hotelName || !reporterName || !contact) {
       return res.status(400).json({ error: 'hotelName, reporterName, contact are required' });
     }
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      console.error('Gmail credentials not configured');
+      return res.status(500).json({ error: 'Email service not configured' });
+    }
     await sendEscalationEmail({ hotelName, reporterName, contact, problem, errorDetail, stepsTried });
     logConversation({ type: 'escalated', hotelName, reporterName, contact, problem });
     res.json({ ok: true });
   } catch (err) {
-    console.error('Escalate error:', err);
+    console.error('Escalate error:', err.message);
     res.status(500).json({ error: 'Failed to send escalation email' });
   }
 });

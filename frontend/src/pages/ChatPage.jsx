@@ -94,11 +94,19 @@ export default function ChatPage() {
       const errorDetail = messages.filter((m) => m.role === 'user').map((m) => m.content).join(' | ');
       const stepsTried = messages.filter((m) => m.role === 'assistant').map((m) => m.content).join('\n---\n');
 
-      await fetch('/api/chat/escalate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, problem, errorDetail, stepsTried }),
-      });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+      try {
+        const res = await fetch('/api/chat/escalate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...formData, problem, errorDetail, stepsTried }),
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error('server error');
+      } finally {
+        clearTimeout(timeout);
+      }
 
       setShowEscForm(false);
       setMessages((prev) => [

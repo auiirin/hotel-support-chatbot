@@ -7,6 +7,9 @@ const transporter = nodemailer.createTransport({
     user: config.gmailUser,
     pass: config.gmailAppPassword,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 export async function sendEscalationEmail({ hotelName, reporterName, contact, problem, errorDetail, stepsTried }) {
