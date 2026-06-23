@@ -55,4 +55,23 @@ router.post('/stream', async (req, res) => {
   }
 });
 
+router.post('/resolve', async (req, res) => {
+  try {
+    const { problem, solution, history = [] } = req.body;
+    if (!problem) return res.status(400).json({ error: 'problem is required' });
+
+    logConversation({
+      type: 'resolved',
+      problem,
+      solution,
+      historyLength: history.length,
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Resolve log error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

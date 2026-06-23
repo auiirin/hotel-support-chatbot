@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble.jsx';
 
-export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onFollowup }) {
+export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onFollowup, onResolved, onEscalate }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -53,9 +53,21 @@ export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onF
             </div>
           </div>
         )}
-        {/* show follow-up chips after last AI message */}
+        {/* Resolve / Escalate actions after last AI message */}
+        {!isStreaming && messages.length > 1 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.content && (
+          <div className="resolve-actions">
+            <button className="resolve-btn" onClick={onResolved}>
+              ✅ แก้ไขเรียบร้อย
+            </button>
+            <button className="escalate-btn" onClick={onEscalate}>
+              ❌ ยังแก้ไม่ได้
+            </button>
+          </div>
+        )}
+
+        {/* follow-up suggestion chips */}
         {!isStreaming && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.content && (
-          <div className="followups" style={{ marginTop: 8 }}>
+          <div className="followups" style={{ marginTop: 4 }}>
             {followups.map((f) => (
               <button key={f} className="followup-chip" onClick={() => onFollowup(f)}>{f}</button>
             ))}

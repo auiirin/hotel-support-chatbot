@@ -611,6 +611,41 @@ body {
 }
 .followup-chip:hover { background: #f5f5f7; }
 
+/* resolve / escalate actions */
+.resolve-actions {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 4px 44px;
+}
+.resolve-btn {
+  flex: 1;
+  background: #edfaf3;
+  border: 1.5px solid #22a06b;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #157a4e;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.resolve-btn:hover { background: #d3f5e5; }
+.escalate-btn {
+  flex: 1;
+  background: #fff5f5;
+  border: 1.5px solid var(--red);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.escalate-btn:hover { background: #ffe5e5; }
+
 /* streaming */
 .bubble-ai.streaming::after {
   content: '▋';

@@ -1,3 +1,11 @@
+export async function resolveCase(problem, solution, history) {
+  await fetch('/api/chat/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ problem, solution, history }),
+  });
+}
+
 export async function sendMessage(message, history) {
   const res = await fetch('/api/chat', {
     method: 'POST',

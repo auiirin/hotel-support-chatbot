@@ -4,7 +4,7 @@ import ChatWindow from '../components/ChatWindow.jsx';
 import InputBar from '../components/InputBar.jsx';
 import LaunchView from '../components/LaunchView.jsx';
 import GuideView from '../components/GuideView.jsx';
-import { sendMessageStream } from '../api/chat.js';
+import { sendMessageStream, resolveCase } from '../api/chat.js';
 
 export default function ChatPage() {
   const [panelOpen, setPanelOpen] = useState(false);
@@ -28,6 +28,15 @@ export default function ChatPage() {
   }
 
   async function handleSend(text, img = null) {
+    // Special internal commands
+    if (text === '__resolved__') {
+      setMessages((prev) => [...prev, { role: 'user', content: '✅ แก้ไขเรียบร้อยแล้วครับ' }]);
+      text = 'แก้ไขเรียบร้อยแล้วครับ ขอบคุณ';
+    } else if (text === '__escalate__') {
+      setMessages((prev) => [...prev, { role: 'user', content: '❌ ทำตาม Step แล้วยังแก้ไม่ได้ครับ' }]);
+      text = 'ทำตาม Step แล้วยังแก้ไม่ได้ครับ ช่วย Escalate ให้ทีม Support ด้วย';
+    }
+
     const imageToSend = img || image;
     const history = messages.map((m) => ({ role: m.role, content: m.content }));
     const userMsg = { role: 'user', content: text, image: imageToSend?.previewUrl || null };
@@ -62,6 +71,17 @@ export default function ChatPage() {
       });
       setIsStreaming(false);
     }
+  }
+
+  async function handleResolved() {
+    const problem = messages.find((m) => m.role === 'user')?.content || '';
+    const solution = messages.filter((m) => m.role === 'assistant').map((m) => m.content).join('\n');
+    await resolveCase(problem, solution, messages);
+    await handleSend('__resolved__');
+  }
+
+  async function handleEscalate() {
+    await handleSend('__escalate__');
   }
 
   function handleClear() {
@@ -132,6 +152,8 @@ export default function ChatPage() {
                     onBack={() => setView('launch')}
                     onGuide={() => setView('guide')}
                     onFollowup={(text) => handleSend(text)}
+                    onResolved={handleResolved}
+                    onEscalate={handleEscalate}
                   />
                   {error && <div className="error-banner">{error}</div>}
                   <InputBar onSend={handleSend} disabled={isStreaming} />
