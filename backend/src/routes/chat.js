@@ -25,9 +25,9 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/stream', async (req, res) => {
-  const { message, history = [] } = req.body;
-  if (!message || typeof message !== 'string' || message.trim() === '') {
-    return res.status(400).json({ error: 'message is required' });
+  const { message = '', history = [], image = null } = req.body;
+  if (!message.trim() && !image) {
+    return res.status(400).json({ error: 'message or image is required' });
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -36,13 +36,13 @@ router.post('/stream', async (req, res) => {
   res.flushHeaders();
 
   try {
-    const contextChunks = await searchRelevantChunks(message.trim());
+    const contextChunks = await searchRelevantChunks(message.trim() || 'error screenshot');
     let fullAnswer = '';
 
     await streamChatResponse(message.trim(), contextChunks, history, (text) => {
       fullAnswer += text;
       res.write(`data: ${JSON.stringify({ text })}\n\n`);
-    });
+    }, image);
 
     const sources = contextChunks.map((c) => c.source).filter(Boolean);
     logConversation({ message: message.trim(), answer: fullAnswer, sources });

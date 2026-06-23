@@ -24,6 +24,7 @@ export default function ChatWindow({ messages, isStreaming }) {
           key={i}
           role={msg.role}
           content={msg.content}
+          image={msg.image || null}
           isStreaming={isStreaming && i === messages.length - 1 && msg.role === 'assistant'}
         />
       ))}

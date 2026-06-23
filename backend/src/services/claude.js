@@ -13,34 +13,46 @@ const SYSTEM_PROMPT = `คุณคือ Support Agent ของระบบจ
 - ห้ามแต่งข้อมูลหรือเดาคำตอบ
 - ตอบให้กระชับ ชัดเจน และเป็นมิตร`;
 
-function buildMessages(userMessage, contextChunks, conversationHistory) {
+function buildMessages(userMessage, contextChunks, conversationHistory, image = null) {
   const contextText =
     contextChunks.length > 0
       ? contextChunks.map((c, i) => `[${i + 1}] ${c.content}`).join('\n\n')
       : 'ไม่พบข้อมูลที่เกี่ยวข้องใน knowledge base';
 
+  const textContent = {
+    type: 'text',
+    text: `Context จาก knowledge base:\n${contextText}\n\nคำถาม: ${userMessage || '(ดูรูปภาพ error ที่แนบมา)'}`,
+  };
+
+  const userContent = image
+    ? [
+        { type: 'image', source: { type: 'base64', media_type: image.mimeType, data: image.base64 } },
+        textContent,
+      ]
+    : textContent.text;
+
   return [
     ...conversationHistory,
-    { role: 'user', content: `Context จาก knowledge base:\n${contextText}\n\nคำถาม: ${userMessage}` },
+    { role: 'user', content: userContent },
   ];
 }
 
-export async function getChatResponse(userMessage, contextChunks, conversationHistory) {
+export async function getChatResponse(userMessage, contextChunks, conversationHistory, image = null) {
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     system: SYSTEM_PROMPT,
-    messages: buildMessages(userMessage, contextChunks, conversationHistory),
+    messages: buildMessages(userMessage, contextChunks, conversationHistory, image),
   });
   return response.content[0].text;
 }
 
-export async function streamChatResponse(userMessage, contextChunks, conversationHistory, onText) {
+export async function streamChatResponse(userMessage, contextChunks, conversationHistory, onText, image = null) {
   const stream = client.messages.stream({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     system: SYSTEM_PROMPT,
-    messages: buildMessages(userMessage, contextChunks, conversationHistory),
+    messages: buildMessages(userMessage, contextChunks, conversationHistory, image),
   });
 
   for await (const event of stream) {

@@ -8,11 +8,11 @@ export async function sendMessage(message, history) {
   return res.json();
 }
 
-export async function sendMessageStream(message, history, onChunk, onDone) {
+export async function sendMessageStream(message, history, onChunk, onDone, image = null) {
   const res = await fetch('/api/chat/stream', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, history }),
+    body: JSON.stringify({ message, history, image }),
   });
 
   if (!res.ok) throw new Error('Failed to connect to stream');

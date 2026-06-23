@@ -9,9 +9,9 @@ export default function ChatPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
 
-  async function handleSend(text) {
+  async function handleSend(text, image = null) {
     const history = messages.map((m) => ({ role: m.role, content: m.content }));
-    const userMsg = { role: 'user', content: text };
+    const userMsg = { role: 'user', content: text, image: image?.previewUrl || null };
 
     setMessages((prev) => [...prev, userMsg, { role: 'assistant', content: '' }]);
     setIsStreaming(true);
@@ -32,6 +32,7 @@ export default function ChatPage() {
           });
         },
         () => setIsStreaming(false),
+        image,
       );
     } catch {
       setError('เกิดข้อผิดพลาด ไม่สามารถเชื่อมต่อกับ server ได้');
