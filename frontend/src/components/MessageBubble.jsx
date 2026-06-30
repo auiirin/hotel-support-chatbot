@@ -18,7 +18,7 @@ export default function MessageBubble({ role, content, image, isStreaming }) {
     <div className="message-row assistant">
       <div className="ai-avatar">AI</div>
       <div className={`bubble-ai${isStreaming ? ' streaming' : ''}`}>
-        <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown>{content.replace('%%SOLUTION%%', '').trimEnd()}</ReactMarkdown>
       </div>
     </div>
   );
