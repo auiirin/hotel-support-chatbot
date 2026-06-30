@@ -53,27 +53,23 @@ export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onF
             </div>
           </div>
         )}
-        {/* Resolve / Escalate actions — only when AI gave numbered solution steps (at least 1. and 2.) */}
-        {!isStreaming && messages.length > 1 && messages[messages.length - 1]?.role === 'assistant' && /1\.\s+.{5,}[\s\S]*?2\.\s+/.test(messages[messages.length - 1]?.content || '') && (
-          <div className="resolve-actions">
-            <button className="resolve-btn" onClick={onResolved}>
-              ✅ แก้ไขเรียบร้อย
-            </button>
-            <button className="escalate-btn" onClick={onEscalate}>
-              ❌ ยังแก้ไม่ได้
-            </button>
-          </div>
-        )}
-
-        {/* follow-up suggestion chips */}
+        {/* follow-up chips + resolve actions — shown after last AI message */}
         {!isStreaming && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.content && (
-          <div className="followups" style={{ marginTop: 4 }}>
-            {followups.map((f) => (
-              <button key={f} className="followup-chip" onClick={() => onFollowup(f)}>{f}</button>
-            ))}
-            <button className="followup-chip" onClick={onGuide} style={{ color: '#6a3bd0', borderColor: '#e3deef' }}>
-              View troubleshooting guide →
-            </button>
+          <div className="chat-actions-wrap">
+            {/1\.\s+.{5,}[\s\S]*?2\.\s+/.test(messages[messages.length - 1]?.content || '') && (
+              <div className="resolve-actions">
+                <button className="resolve-btn" onClick={onResolved}>✅ แก้ไขเรียบร้อย</button>
+                <button className="escalate-btn" onClick={onEscalate}>❌ ยังแก้ไม่ได้</button>
+              </div>
+            )}
+            <div className="followups">
+              {followups.map((f) => (
+                <button key={f} className="followup-chip" onClick={() => onFollowup(f)}>{f}</button>
+              ))}
+              <button className="followup-chip" onClick={onGuide} style={{ color: '#6a3bd0', borderColor: '#e3deef' }}>
+                View troubleshooting guide →
+              </button>
+            </div>
           </div>
         )}
         <div ref={bottomRef} />
