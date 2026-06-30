@@ -32,6 +32,24 @@ export default function InputBar({ onSend, disabled }) {
     }
   }
 
+  function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          setImage({ base64: dataUrl.split(',')[1], mimeType: file.type, previewUrl: dataUrl });
+        };
+        reader.readAsDataURL(file);
+        break;
+      }
+    }
+  }
+
   return (
     <div className="input-bar-wrap">
       {image && (
@@ -46,6 +64,7 @@ export default function InputBar({ onSend, disabled }) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           placeholder="Ask a follow-up…"
           disabled={disabled}
           rows={1}

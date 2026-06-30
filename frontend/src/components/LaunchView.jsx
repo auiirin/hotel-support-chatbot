@@ -78,25 +78,47 @@ export default function LaunchView({ onSend, onSendImage, disabled, image, onAtt
 
 function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveImage, fileInputRef }) {
   const [text, setText] = useState('');
+  const [pastedImage, setPastedImage] = useState(null);
   const textareaRef = useRef(null);
 
+  const activeImage = pastedImage || image;
+
   function handleSubmit() {
-    if (!text.trim() && !image) return;
-    if (image) onSendImage(text.trim(), image);
+    if (!text.trim() && !activeImage) return;
+    if (activeImage) onSendImage(text.trim(), activeImage);
     else onSend(text.trim());
     setText('');
+    setPastedImage(null);
   }
 
   function handleKeyDown(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
   }
 
+  function handlePaste(e) {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          setPastedImage({ base64: dataUrl.split(',')[1], mimeType: file.type, previewUrl: dataUrl });
+        };
+        reader.readAsDataURL(file);
+        break;
+      }
+    }
+  }
+
   return (
     <div className="input-bar-wrap">
-      {image && (
+      {activeImage && (
         <div className="image-preview-wrap">
-          <img src={image.previewUrl} alt="แนบรูป" className="image-preview" />
-          <button type="button" className="image-remove-btn" onClick={onRemoveImage}>✕</button>
+          <img src={activeImage.previewUrl} alt="แนบรูป" className="image-preview" />
+          <button type="button" className="image-remove-btn" onClick={() => { setPastedImage(null); onRemoveImage(); }}>✕</button>
         </div>
       )}
       <div className="input-container" onClick={() => textareaRef.current?.focus()}>
@@ -108,6 +130,7 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           disabled={disabled}
           style={{ pointerEvents: 'auto', userSelect: 'text' }}
         />
@@ -126,7 +149,7 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
                 <path d="m6 9 6 6 6-6"/>
               </svg>
             </button>
-            <button className="send-btn" type="button" disabled={disabled || (!text.trim() && !image)} onClick={handleSubmit}>
+            <button className="send-btn" type="button" disabled={disabled || (!text.trim() && !activeImage)} onClick={handleSubmit}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4">
                 <path d="M12 19V5M5 12l7-7 7 7"/>
               </svg>
