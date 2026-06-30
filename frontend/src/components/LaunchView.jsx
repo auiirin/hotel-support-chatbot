@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export default function LaunchView({ onSend, onSendImage, disabled, image, onAttach, onRemoveImage, fileInputRef }) {
   const suggestions = [
@@ -78,6 +78,7 @@ export default function LaunchView({ onSend, onSendImage, disabled, image, onAtt
 
 function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveImage, fileInputRef }) {
   const [text, setText] = useState('');
+  const textareaRef = useRef(null);
 
   function handleSubmit() {
     if (!text.trim() && !image) return;
@@ -98,8 +99,9 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
           <button type="button" className="image-remove-btn" onClick={onRemoveImage}>✕</button>
         </div>
       )}
-      <div className="input-container">
+      <div className="input-container" onClick={() => textareaRef.current?.focus()}>
         <textarea
+          ref={textareaRef}
           className="launch-textarea"
           placeholder="Ask something…"
           rows={1}
@@ -107,6 +109,7 @@ function InputFooter({ onSend, onSendImage, disabled, image, onAttach, onRemoveI
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
+          style={{ pointerEvents: 'auto', userSelect: 'text' }}
         />
         <div className="input-row">
           <button className="attach-btn" type="button" onClick={() => fileInputRef.current?.click()} disabled={disabled}>
