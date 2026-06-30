@@ -56,7 +56,7 @@ export default function ChatWindow({ messages, isStreaming, onBack, onGuide, onF
         {/* follow-up chips + resolve actions — shown after last AI message */}
         {!isStreaming && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.content && (
           <div className="chat-actions-wrap">
-            {/1\.\s+.{5,}[\s\S]*?2\.\s+/.test(messages[messages.length - 1]?.content || '') && (
+            {(() => { const c = messages[messages.length - 1]?.content || ''; return /1\.\s+.*(เข้า|กด|คลิก|เลือก|ปิด|เปิด|ตรวจสอบ|แก้ไข|ลอง|go to|click|open|select|press|check|restart|enable|disable)/i.test(c) && /2\.\s+/.test(c); })() && (
               <div className="resolve-actions">
                 <button className="resolve-btn" onClick={onResolved}>✅ แก้ไขเรียบร้อย</button>
                 <button className="escalate-btn" onClick={onEscalate}>❌ ยังแก้ไม่ได้</button>
