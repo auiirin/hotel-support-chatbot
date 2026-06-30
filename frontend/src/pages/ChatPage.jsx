@@ -147,7 +147,6 @@ export default function ChatPage() {
       {/* Panel */}
       {panelOpen && (
         <>
-          <div className="panel-overlay" onClick={handleClose} />
           <div className="app">
             <header className="app-header">
               <div className="header-ai-badge">AI</div>
